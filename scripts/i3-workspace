@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Switch to or create an i3 workspace by name, or fuzzy-find with fzf
+
+set -euo pipefail
+
+if [[ $# -ge 1 ]]; then
+    i3-msg workspace "$1"
+else
+    workspaces=$(i3-msg -t get_workspaces | jq -r '.[].name' | sort)
+    selected=$(echo "$workspaces" | fzf --prompt="workspace: " --print-query | tail -1)
+    [[ -n "$selected" ]] && i3-msg workspace "$selected"
+fi

@@ -6,8 +6,9 @@ from abc import ABC, abstractmethod
 class Command(ABC):
     """Base class for i3helper subcommands."""
 
-    name: str  # subcommand name, e.g. "workspace"
-    description: str  # short description for help text
+    name: str           # subcommand name, e.g. "workspace"
+    display_name: str   # shown in ulauncher, e.g. "Workspace Selector"
+    description: str    # short description for help text
 
     def __init__(self, backend):
         self.backend = backend
@@ -19,10 +20,10 @@ class Command(ABC):
 
     @abstractmethod
     def get_results(self, query):
-        """Return list of result dicts for ulauncher: [{name, description, icon, data}]."""
+        """Return list of result dicts for ulauncher: [{name, description, on_enter}]."""
         ...
 
     @abstractmethod
-    def execute(self, data):
-        """Execute an action from ulauncher item selection. data is the dict from get_results."""
+    def execute_ulauncher(self, data, **kwargs):
+        """Execute an action from ulauncher item selection. Return an action."""
         ...

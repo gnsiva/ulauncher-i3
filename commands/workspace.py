@@ -5,17 +5,28 @@ import sys
 
 from commands.base import Command
 
+try:
+    from ulauncher.api.shared.action.ExtensionCustomAction import ExtensionCustomAction
+    from ulauncher.api.shared.action.HideWindowAction import HideWindowAction
+    _HAS_ULAUNCHER = True
+except ImportError:
+    _HAS_ULAUNCHER = False
+
+
+def _fuzzy_match(query, text):
+    """Simple case-insensitive substring match."""
+    return query.lower() in text.lower()
+
 
 class WorkspaceCommand(Command):
     name = "workspace"
+    display_name = "Workspace Selector"
     description = "Switch to or create an i3 workspace"
 
     def run_cli(self, args):
         if args:
-            # Direct switch/create
             self.backend.switch_workspace(" ".join(args))
         else:
-            # fzf picker
             workspaces = self.backend.get_workspaces()
             names = sorted(ws["name"] for ws in workspaces)
             if not names:
@@ -39,22 +50,46 @@ class WorkspaceCommand(Command):
 
     def get_results(self, query):
         workspaces = self.backend.get_workspaces()
+        query = query.strip()
         results = []
+
         for ws in sorted(workspaces, key=lambda w: w["name"]):
+            if query and not _fuzzy_match(query, ws["name"]):
+                continue
             prefix = "→ " if ws["focused"] else ""
             results.append({
                 "name": f"{prefix}{ws['name']}",
                 "description": f"Output: {ws['output']}",
-                "data": {"action": "switch", "workspace": ws["name"]},
+                "on_enter": ExtensionCustomAction({
+                    "command": "workspace",
+                    "action": "switch",
+                    "workspace": ws["name"],
+                }),
             })
-        # If query doesn't match any existing workspace, offer to create it
-        if query and not any(ws["name"] == query for ws in workspaces):
-            results.insert(0, {
-                "name": f"Create workspace: {query}",
-                "description": "Switch to new workspace",
-                "data": {"action": "switch", "workspace": query},
-            })
+
+        # Always show "Create New Workspace" at the bottom
+        results.append({
+            "name": "Create New Workspace",
+            "description": f'Create and switch to "{query}"' if query else "Type a name for the new workspace",
+            "on_enter": ExtensionCustomAction({
+                "command": "workspace",
+                "action": "create",
+                "workspace": query,
+            }) if query else ExtensionCustomAction({
+                "command": "workspace",
+                "action": "create_prompt",
+            }),
+        })
+
         return results
 
-    def execute(self, data):
-        self.backend.switch_workspace(data["workspace"])
+    def execute_ulauncher(self, data, **kwargs):
+        action = data.get("action")
+        if action == "switch":
+            self.backend.switch_workspace(data["workspace"])
+            return HideWindowAction()
+        if action == "create" and data.get("workspace"):
+            self.backend.switch_workspace(data["workspace"])
+            return HideWindowAction()
+        # create_prompt or create with no name — keep ulauncher open, user needs to type more
+        return None

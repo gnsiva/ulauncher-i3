@@ -14,6 +14,18 @@ i3helper layout <mode>             # future
 
 Both CLI and ulauncher share the same command layer — ulauncher just provides results instead of using fzf.
 
+## Ulauncher UX Flow
+1. User types `i3` (or `workspace`, etc.) → ulauncher shows "i3 Workspace Selector"
+2. User selects it → extension activates, immediately shows all open workspaces + "Create New Workspace"
+3. User types to fuzzy filter workspaces
+4. Selecting a workspace → switches to it
+5. Selecting "Create New Workspace" → creates workspace with typed name
+
+Key decisions:
+- Default to workspace results on activation (no subcommand menu needed since workspace is primary)
+- manifest.json keyword `name` must be descriptive (e.g. "i3 Workspace Selector") for ulauncher matching
+- Fuzzy filtering done in extension code, not relying on ulauncher's matching
+
 ## Directory Structure
 ```
 ulauncher-i3/
@@ -45,9 +57,10 @@ ulauncher-i3/
 - [x] Symlink `i3helper` to `~/.local/bin/`
 
 ### Phase 2: Ulauncher extension
-- [x] `manifest.json` — keyword `i3`, preferences
-- [x] `main.py` — on KeywordQueryEvent, parse input as `<subcommand> [args]`, call command's `get_results(query)` to build result items; on ItemEnterEvent, call `execute(data)`
-- [x] Workspace command returns result items for ulauncher (no fzf, ulauncher does the filtering)
+- [x] `manifest.json` — keyword `i3`, name "i3 Workspace Selector" for discoverability
+- [x] `main.py` — defaults to workspace results on activation, subcommand routing for future commands
+- [x] Workspace command: fuzzy filter, "Create New Workspace" always at bottom
+- [x] Symlink repo to `~/.local/share/ulauncher/extensions/`
 
 ### Phase 3: Polish
 - [ ] Icon

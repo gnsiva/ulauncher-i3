@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+"""i3helper — CLI for i3wm control."""
+
+import sys
+import os
+
+# Ensure the repo root is on the path so commands/ and i3_backend are importable
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from i3_backend import I3Backend
+from commands import get_command, all_command_names
+
+
+def main():
+    if len(sys.argv) < 2:
+        print(f"Usage: i3helper <command> [args...]")
+        print(f"Commands: {', '.join(all_command_names())}")
+        sys.exit(1)
+
+    subcmd = sys.argv[1]
+    args = sys.argv[2:]
+
+    backend = I3Backend()
+    cmd = get_command(subcmd, backend)
+    if not cmd:
+        print(f"Unknown command: {subcmd}", file=sys.stderr)
+        print(f"Available: {', '.join(all_command_names())}", file=sys.stderr)
+        sys.exit(1)
+
+    cmd.run_cli(args)
+
+
+if __name__ == "__main__":
+    main()

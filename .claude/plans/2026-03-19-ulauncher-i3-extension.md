@@ -35,19 +35,19 @@ ulauncher-i3/
 ## Implementation Steps
 
 ### Phase 1: CLI core
-- [ ] `i3_backend.py` — wrapper around i3ipc/i3-msg for querying workspaces and running commands
-- [ ] `commands/base.py` — base command interface: `name`, `run_cli(args)`, `get_results(query)`, `execute(data)`
-- [ ] `commands/workspace.py`:
+- [x] `i3_backend.py` — wrapper around i3ipc/i3-msg for querying workspaces and running commands
+- [x] `commands/base.py` — base command interface: `name`, `run_cli(args)`, `get_results(query)`, `execute(data)`
+- [x] `commands/workspace.py`:
   - `i3helper workspace` → fzf picker over current workspaces
   - `i3helper workspace <name>` → switch/create
-- [ ] `commands/__init__.py` — registry, maps subcommand names to command classes
-- [ ] `i3helper` CLI entry point — argparse/sys.argv, dispatches to command registry
-- [ ] Symlink `i3helper` to `~/.local/bin/`
+- [x] `commands/__init__.py` — registry, maps subcommand names to command classes
+- [x] `i3helper` CLI entry point — sys.argv, dispatches to command registry
+- [x] Symlink `i3helper` to `~/.local/bin/`
 
 ### Phase 2: Ulauncher extension
-- [ ] `manifest.json` — keyword `i3helper`, preferences
-- [ ] `main.py` — on KeywordQueryEvent, parse input as `<subcommand> [args]`, call command's `get_results(query)` to build result items; on ItemEnterEvent, call `execute(data)`
-- [ ] Workspace command returns result items for ulauncher (no fzf, ulauncher does the filtering)
+- [x] `manifest.json` — keyword `i3`, preferences
+- [x] `main.py` — on KeywordQueryEvent, parse input as `<subcommand> [args]`, call command's `get_results(query)` to build result items; on ItemEnterEvent, call `execute(data)`
+- [x] Workspace command returns result items for ulauncher (no fzf, ulauncher does the filtering)
 
 ### Phase 3: Polish
 - [ ] Icon

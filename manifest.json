@@ -1,0 +1,19 @@
+{
+  "required_api_version": "2",
+  "name": "i3helper",
+  "description": "Control i3wm from Ulauncher — workspaces, layout, and more",
+  "developer_name": "gns",
+  "icon": "images/icon.png",
+  "options": {
+    "query_debounce": 0.05
+  },
+  "preferences": [
+    {
+      "id": "kw",
+      "type": "keyword",
+      "name": "Keyword",
+      "description": "Keyword to trigger i3helper",
+      "default_value": "i3"
+    }
+  ]
+}

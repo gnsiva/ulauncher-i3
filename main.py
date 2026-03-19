@@ -45,8 +45,8 @@ class QueryListener(EventListener):
 
         cmd = get_command(subcmd_name, extension.backend)
 
-        # Subcommand matched and user has typed past it (space after subcommand)
-        if cmd and (len(parts) > 1 or raw_arg.endswith(" ")):
+        if cmd:
+            # Subcommand matched — show its results, filtered by remaining query
             results = cmd.get_results(subcmd_query)
             return RenderResultListAction([
                 ExtensionResultItem(
@@ -58,20 +58,19 @@ class QueryListener(EventListener):
                 for r in results
             ])
 
-        # Top level — show available commands, fuzzy filtered by what's typed
-        items = []
-        for name in all_command_names():
-            c = get_command(name, extension.backend)
-            display = c.display_name
-            if query and query.lower() not in display.lower():
-                continue
-            items.append(ExtensionResultItem(
+        # No subcommand matched — show all workspaces + available commands
+        # Default to workspace results since it's the primary use case
+        ws_cmd = get_command("workspace", extension.backend)
+        results = ws_cmd.get_results(query)
+        return RenderResultListAction([
+            ExtensionResultItem(
                 icon=ICON_PATH,
-                name=display,
-                description=c.description,
-                on_enter=SetUserQueryAction(f"{keyword} {name} ")
-            ))
-        return RenderResultListAction(items)
+                name=r["name"],
+                description=r.get("description", ""),
+                on_enter=r["on_enter"]
+            )
+            for r in results
+        ])
 
 
 class EnterListener(EventListener):

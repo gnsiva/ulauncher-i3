@@ -11,8 +11,8 @@
     {
       "id": "kw",
       "type": "keyword",
-      "name": "Keyword",
-      "description": "Keyword to trigger i3helper",
+      "name": "i3 Workspace Selector",
+      "description": "Switch to or create i3 workspaces",
       "default_value": "i3"
     }
   ]

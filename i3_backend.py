@@ -35,3 +35,6 @@ class I3Backend:
 
     def switch_workspace(self, name):
         self.command(f"workspace {name}")
+
+    def move_to_workspace(self, name):
+        self.command(f"move container to workspace {name}")

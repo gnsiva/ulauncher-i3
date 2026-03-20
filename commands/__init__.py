@@ -1,9 +1,11 @@
 """Command registry for i3helper."""
 
 from commands.workspace import WorkspaceCommand
+from commands.move import MoveCommand
 
 COMMANDS = {
     WorkspaceCommand.name: WorkspaceCommand,
+    MoveCommand.name: MoveCommand,
 }
 
 

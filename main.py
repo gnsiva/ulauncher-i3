@@ -58,19 +58,19 @@ class QueryListener(EventListener):
                 for r in results
             ])
 
-        # No subcommand matched — show all workspaces + available commands
-        # Default to workspace results since it's the primary use case
-        ws_cmd = get_command("workspace", extension.backend)
-        results = ws_cmd.get_results(query)
-        return RenderResultListAction([
-            ExtensionResultItem(
+        # No subcommand matched — show available commands, filtered by query
+        items = []
+        for name in all_command_names():
+            c = get_command(name, extension.backend)
+            if query and not (query.lower() in c.display_name.lower() or query.lower() in name.lower()):
+                continue
+            items.append(ExtensionResultItem(
                 icon=ICON_PATH,
-                name=r["name"],
-                description=r.get("description", ""),
-                on_enter=r["on_enter"]
-            )
-            for r in results
-        ])
+                name=c.display_name,
+                description=c.description,
+                on_enter=SetUserQueryAction(f"{keyword} {name} ")
+            ))
+        return RenderResultListAction(items)
 
 
 class EnterListener(EventListener):
